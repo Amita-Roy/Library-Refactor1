@@ -1,5 +1,7 @@
-let myLibrary = [];
-const addNewBookButton = document.querySelector('button.newBook');
+// let myLibrary = [];
+const addNewBookButton = document.querySelector("button.newBook");
+
+let content = "";
 
 class Book {
   constructor(title, author, pages, id) {
@@ -7,7 +9,7 @@ class Book {
     this.title = title;
     this.author = author;
     this.pages = pages;
-    this.read = 'Not Read';
+    this.read = "Not Read";
   }
 
   info() {
@@ -15,12 +17,31 @@ class Book {
   }
 }
 
-const addBookToLibrary = (title, author, pages, id) => {
-  const newBook = new Book(title, author, pages, id);
-  myLibrary.push(newBook);
-};
+class Library {
+  constructor() {
+    this.books = [];
+  }
 
-let content = '';
+  addBook(title, author, pages, id) {
+    const newBook = new Book(title, author, pages, id);
+    this.books.push(newBook);
+  }
+
+  allBooks() {
+    return this.books;
+  }
+
+  displayAllBooks() {
+    this.books.forEach((book, index) => {
+      content += bookCard(book, index);
+    });
+  }
+}
+
+// const addBookToLibrary = (title, author, pages, id) => {
+//   const newBook = new Book(title, author, pages, id);
+//   myLibrary.push(newBook);
+// };
 
 const bookCard = (book, index) => `
 <div id="book-${index}" class="col-md-4 mt-2">
@@ -36,50 +57,55 @@ const bookCard = (book, index) => `
   </div>
 `;
 
-const displayAllBooks = (books) => {
-  books.forEach((book, index) => {
-    content += bookCard(book, index);
-  });
-};
+// const displayAllBooks = (books) => {
+//   books.forEach((book, index) => {
+//     content += bookCard(book, index);
+//   });
+// };
+
+let myLibrary = new Library();
 
 const formSubmission = (event) => {
   event.preventDefault();
-  content = '';
+  content = "";
   const form = event.target;
   const values = $(form).serializeArray();
-  const index = myLibrary.length;
-  addBookToLibrary(values[0].value, values[1].value, values[2].value, index);
-  displayAllBooks(myLibrary);
-  document.querySelector('.books-grid').innerHTML = content;
+  const index = myLibrary.books.length;
+  myLibrary.addBook(values[0].value, values[1].value, values[2].value, index);
+  // addBookToLibrary(values[0].value, values[1].value, values[2].value, index);
+  // displayAllBooks(myLibrary);
+  myLibrary.displayAllBooks();
+  document.querySelector(".books-grid").innerHTML = content;
   form.reset();
 
-  myLibrary.forEach((book, index) => {
+  myLibrary.books.forEach((book, index) => {
     const deleteButton = document.querySelector(`#book-${index} button.delete`);
     const statusButton = document.querySelector(`#book-${index} button.status`);
 
-    deleteButton.addEventListener('click', () => {
-      myLibrary = myLibrary.filter((book) => book.id !== index);
+    deleteButton.addEventListener("click", () => {
+      myLibrary.books = myLibrary.books.filter((book) => book.id !== index);
       const card = document.getElementById(`book-${index}`);
       if (card) {
         card.remove();
       }
     });
 
-    const readStatus = () => ($(statusButton).html() === 'Read'
-      ? $(statusButton).html('Not Read')
-      : $(statusButton).html('Read'));
+    const readStatus = () =>
+      $(statusButton).html() === "Read"
+        ? $(statusButton).html("Not Read")
+        : $(statusButton).html("Read");
 
-    statusButton.addEventListener('click', readStatus);
+    statusButton.addEventListener("click", readStatus);
   });
 
-  if ($('.form').hasClass('show')) {
-    $('.form').addClass('hide');
-    $('.form').removeClass('show');
+  if ($(".form").hasClass("show")) {
+    $(".form").addClass("hide");
+    $(".form").removeClass("show");
   }
 };
 
-$('form').on('submit', formSubmission);
+$("form").on("submit", formSubmission);
 
-addNewBookButton.addEventListener('click', () => {
-  $('.form').toggleClass('hide show');
+addNewBookButton.addEventListener("click", () => {
+  $(".form").toggleClass("hide show");
 });
