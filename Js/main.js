@@ -1,24 +1,4 @@
-let myLibrary = [];
 const addNewBookButton = document.querySelector('button.newBook');
-
-class Book {
-  constructor(title, author, pages, id) {
-    this.id = id;
-    this.title = title;
-    this.author = author;
-    this.pages = pages;
-    this.read = 'Not Read';
-  }
-
-  info() {
-    return `${this.title}, by ${this.author}, ${this.pages} pages`;
-  }
-}
-
-const addBookToLibrary = (title, author, pages, id) => {
-  const newBook = new Book(title, author, pages, id);
-  myLibrary.push(newBook);
-};
 
 let content = '';
 
@@ -36,29 +16,46 @@ const bookCard = (book, index) => `
   </div>
 `;
 
-const displayAllBooks = (books) => {
-  books.forEach((book, index) => {
-    content += bookCard(book, index);
-  });
-};
+class Library {
+  constructor() {
+    this.books = [];
+  }
+
+  addBook(title, author, pages, id) {
+    const newBook = new Book(title, author, pages, id);
+    this.books.push(newBook);
+  }
+
+  allBooks() {
+    return this.books;
+  }
+
+  displayAllBooks() {
+    this.books.forEach((book, index) => {
+      content += bookCard(book, index);
+    });
+  }
+}
+
+const myLibrary = new Library();
 
 const formSubmission = (event) => {
   event.preventDefault();
   content = '';
   const form = event.target;
   const values = $(form).serializeArray();
-  const index = myLibrary.length;
-  addBookToLibrary(values[0].value, values[1].value, values[2].value, index);
-  displayAllBooks(myLibrary);
+  const index = myLibrary.books.length;
+  myLibrary.addBook(values[0].value, values[1].value, values[2].value, index);
+  myLibrary.displayAllBooks();
   document.querySelector('.books-grid').innerHTML = content;
   form.reset();
 
-  myLibrary.forEach((book, index) => {
+  myLibrary.books.forEach((book, index) => {
     const deleteButton = document.querySelector(`#book-${index} button.delete`);
     const statusButton = document.querySelector(`#book-${index} button.status`);
 
     deleteButton.addEventListener('click', () => {
-      myLibrary = myLibrary.filter((book) => book.id !== index);
+      myLibrary.books = myLibrary.books.filter((book) => book.id !== index);
       const card = document.getElementById(`book-${index}`);
       if (card) {
         card.remove();
